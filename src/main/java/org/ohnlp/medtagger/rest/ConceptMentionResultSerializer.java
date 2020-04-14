@@ -22,7 +22,6 @@ public class ConceptMentionResultSerializer implements UIMANLPResultSerializer {
     @Override
     public Serializable serializeNLPResult(CAS cas) {
         try {
-            Logger.getLogger("ConceptMentionResults").log(Level.INFO, "Parsing Results");
             List<JsonNode> out = new LinkedList<>();
             Collection<ConceptMention> cm = JCasUtil.select(cas.getJCas(), ConceptMention.class);
             cm.forEach(c -> out.add(serialize(c)));
@@ -36,12 +35,12 @@ public class ConceptMentionResultSerializer implements UIMANLPResultSerializer {
         ObjectNode ret = JsonNodeFactory.instance.objectNode();
         ret.put("concept_code", cm.getNormTarget());
         ret.put("status", cm.getStatus());
+        ret.put("certainty", cm.getCertainty());
         ret.put("experiencer", cm.getExperiencer());
         ret.put("match_start", cm.getBegin());
         ret.put("match_end", cm.getEnd());
         ret.put("matched_text", cm.getCoveredText());
         ret.put("sentence_containing_match", cm.getSentence().getCoveredText());
-        Logger.getLogger("ConceptMentionResults").log(Level.INFO, "Result " + ret.toString());
         return ret;
 
     }

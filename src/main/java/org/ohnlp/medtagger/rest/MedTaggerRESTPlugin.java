@@ -37,12 +37,10 @@ public class MedTaggerRESTPlugin implements UIMAServerPlugin {
                 String resourcePath = new File(pipeline.get("path").asText()).getAbsolutePath();
                 // Now construct the appropriate analysis engine
                 AnalysisEngineDescription descMedTaggerTAE = null;
-                AnalysisEngineDescription metadataTAE = null;
                 try {
                     descMedTaggerTAE = createEngineDescription(
                             "desc.medtaggeriedesc.aggregate_analysis_engine.MedTaggerIEAggregateTAE");
-                    metadataTAE = AnalysisEngineFactory.createEngineDescription(OutputTextContents.class);
-                } catch (InvalidXMLException | IOException | ResourceInitializationException e) {
+                } catch (InvalidXMLException | IOException e) {
                     throw new RuntimeException(e);
                 }
 
@@ -54,7 +52,6 @@ public class MedTaggerRESTPlugin implements UIMAServerPlugin {
 
                 AggregateBuilder ab = new AggregateBuilder();
                 ab.add(descMedTaggerTAE);
-                ab.add(metadataTAE);
                 // And register the stream
                 try {
                     uimaServer.registerStream(id, null, ab.createAggregateDescription());
