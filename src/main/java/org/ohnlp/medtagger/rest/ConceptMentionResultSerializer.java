@@ -15,11 +15,14 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ConceptMentionResultSerializer implements UIMANLPResultSerializer {
     @Override
     public Serializable serializeNLPResult(CAS cas) {
         try {
+            Logger.getLogger("ConceptMentionResults").log(Level.INFO, "Parsing Results");
             List<JsonNode> out = new LinkedList<>();
             Collection<ConceptMention> cm = JCasUtil.select(cas.getJCas(), ConceptMention.class);
             cm.forEach(c -> out.add(serialize(c)));
@@ -38,6 +41,7 @@ public class ConceptMentionResultSerializer implements UIMANLPResultSerializer {
         ret.put("match_end", cm.getEnd());
         ret.put("matched_text", cm.getCoveredText());
         ret.put("sentence_containing_match", cm.getSentence().getCoveredText());
+        Logger.getLogger("ConceptMentionResults").log(Level.INFO, "Result " + ret.toString());
         return ret;
 
     }

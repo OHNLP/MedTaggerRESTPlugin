@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.mayo.bsi.uima.server.api.UIMAServer;
 import edu.mayo.bsi.uima.server.api.UIMAServerPlugin;
+import org.apache.log4j.lf5.LogLevel;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
 import org.apache.uima.resource.metadata.ConfigurationParameterSettings;
@@ -12,6 +13,8 @@ import org.apache.uima.util.InvalidXMLException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
 
@@ -45,8 +48,9 @@ public class MedTaggerRESTPlugin implements UIMAServerPlugin {
                 metadata.setConfigurationParameterSettings(settings);
                 // And register the stream
                 uimaServer.registerStream(id, null, descMedTaggerTAE);
+                Logger.getLogger(getName()).log(Level.INFO, "Registered medtagger stream " + id);
             });
-        } catch (IOException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
         uimaServer.registerSerializer("medtagger", new ConceptMentionResultSerializer());
