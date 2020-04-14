@@ -8,6 +8,7 @@ import edu.mayo.bsi.uima.server.api.UIMAServerPlugin;
 import org.apache.log4j.lf5.LogLevel;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
+import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.ConfigurationParameterSettings;
@@ -50,8 +51,16 @@ public class MedTaggerRESTPlugin implements UIMAServerPlugin {
                 ConfigurationParameterSettings settings = metadata.getConfigurationParameterSettings();
                 settings.setParameterValue("Resource_dir", resourcePath);
                 metadata.setConfigurationParameterSettings(settings);
+
+                AggregateBuilder ab = new AggregateBuilder();
+                ab.add(descMedTaggerTAE);
+                ab.add(metadataTAE);
                 // And register the stream
-                uimaServer.registerStream(id, metadataTAE, descMedTaggerTAE);
+                try {
+                    uimaServer.registerStream(id, null, ab.createAggregateDescription());
+                } catch (ResourceInitializationException e) {
+                    e.printStackTrace();
+                }
                 Logger.getLogger(getName()).log(Level.INFO, "Registered medtagger stream " + id);
             });
         } catch (Throwable e) {
