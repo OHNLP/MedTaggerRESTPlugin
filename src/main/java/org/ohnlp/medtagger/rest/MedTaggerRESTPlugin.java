@@ -49,5 +49,6 @@ public class MedTaggerRESTPlugin implements UIMAServerPlugin {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        uimaServer.registerSerializer("medtagger", new ConceptMentionResultSerializer());
     }
 }
