@@ -1,0 +1,8 @@
+{
+  "pipelines": [
+    {
+      "id": "Insert an Identifier for this Ruleset. You will use this identifier as part of the REST call to indicate this is the ruleset to be ran",
+      "path": "either an absolute (starts with /) or relative path (relative to working directory, starts with .) to the medtagger resource folder. That folder should be one that contains used_resources.txt at it's root",
+    }
+  ]
+}
