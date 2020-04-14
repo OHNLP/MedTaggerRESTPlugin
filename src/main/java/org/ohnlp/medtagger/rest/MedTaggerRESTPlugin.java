@@ -8,6 +8,8 @@ import edu.mayo.bsi.uima.server.api.UIMAServerPlugin;
 import org.apache.log4j.lf5.LogLevel;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
+import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.ConfigurationParameterSettings;
 import org.apache.uima.util.InvalidXMLException;
 
@@ -34,10 +36,12 @@ public class MedTaggerRESTPlugin implements UIMAServerPlugin {
                 String resourcePath = new File(pipeline.get("path").asText()).getAbsolutePath();
                 // Now construct the appropriate analysis engine
                 AnalysisEngineDescription descMedTaggerTAE = null;
+                AnalysisEngineDescription metadataTAE = null;
                 try {
                     descMedTaggerTAE = createEngineDescription(
                             "desc.medtaggeriedesc.aggregate_analysis_engine.MedTaggerIEAggregateTAE");
-                } catch (InvalidXMLException | IOException e) {
+                    metadataTAE = AnalysisEngineFactory.createEngineDescription(OutputTextContents.class);
+                } catch (InvalidXMLException | IOException | ResourceInitializationException e) {
                     throw new RuntimeException(e);
                 }
 
@@ -47,7 +51,7 @@ public class MedTaggerRESTPlugin implements UIMAServerPlugin {
                 settings.setParameterValue("Resource_dir", resourcePath);
                 metadata.setConfigurationParameterSettings(settings);
                 // And register the stream
-                uimaServer.registerStream(id, null, descMedTaggerTAE);
+                uimaServer.registerStream(id, metadataTAE, descMedTaggerTAE);
                 Logger.getLogger(getName()).log(Level.INFO, "Registered medtagger stream " + id);
             });
         } catch (Throwable e) {
