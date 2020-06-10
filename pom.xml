@@ -5,12 +5,25 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>edu.mayo.bsi.uima-server</groupId>
+        <groupId>edu.mayo.dhs.uima-server</groupId>
         <artifactId>UIMA-Server-Plugins-Parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
     <packaging>jar</packaging>
+
+        <repositories>
+            <repository>
+                <id>uima-server</id>
+                <name>GitHub UIMA-Server Apache Maven Packages</name>
+                <url>https://maven.pkg.github.com/OHNLP/UIMA-Stream-Server</url>
+            </repository>
+            <repository>
+                <id>medtagger</id>
+                <name>GitHub OHNLP MedTagger Apache Maven Packages</name>
+                <url>https://maven.pkg.github.com/OHNLP/MedTagger</url>
+            </repository>
+        </repositories>
 
     <build>
         <plugins>
