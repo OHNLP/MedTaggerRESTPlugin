@@ -19,7 +19,7 @@ jobs:
       with:
         java-version: 1.8
     - name: Build with Maven
-      run: mvn clean install --file pom.xml
+      run: mvn clean install --file pom.xml -s settings.xml
 
     - name: Build with Ant
       run: ant dist -noinput -buildfile build.xml
