@@ -20,12 +20,12 @@ import java.util.logging.Logger;
 
 public class ConceptMentionResultSerializer implements UIMANLPResultSerializer {
     @Override
-    public Serializable serializeNLPResult(CAS cas) {
+    public JsonNode serializeNLPResult(CAS cas) {
         try {
             List<JsonNode> out = new LinkedList<>();
             Collection<ConceptMention> cm = JCasUtil.select(cas.getJCas(), ConceptMention.class);
             cm.forEach(c -> out.add(serialize(c)));
-            return new ObjectMapper().writer().writeValueAsString(out);
+            return new ObjectMapper().valueToTree(out);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
