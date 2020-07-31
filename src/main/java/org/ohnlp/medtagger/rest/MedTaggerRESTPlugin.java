@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.mayo.dhs.uima.server.api.UIMAServer;
 import edu.mayo.dhs.uima.server.api.UIMAServerPlugin;
-import org.apache.log4j.lf5.LogLevel;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.metadata.AnalysisEngineMetaData;
 import org.apache.uima.fit.factory.AggregateBuilder;
@@ -34,31 +33,52 @@ public class MedTaggerRESTPlugin implements UIMAServerPlugin {
             ArrayNode pipelines = (ArrayNode) config.get("pipelines");
             pipelines.forEach(pipeline -> {
                 String id = pipeline.get("id").asText();
-                String resourcePath = new File(pipeline.get("path").asText()).getAbsolutePath();
-                // Now construct the appropriate analysis engine
-                AnalysisEngineDescription descMedTaggerTAE = null;
-                try {
-                    descMedTaggerTAE = createEngineDescription(
-                            "desc.medtaggeriedesc.aggregate_analysis_engine.MedTaggerIEAggregateTAE");
-                } catch (InvalidXMLException | IOException e) {
-                    throw new RuntimeException(e);
+                // Now construct the appropriate analysis engine: if path is "dynamic" then use dynamic IE mode otherwise load path
+                if (pipeline.get("path").asText().equalsIgnoreCase("dynamic")) {
+                    AnalysisEngineDescription descMedTaggerTAE = null;
+                    try {
+                        descMedTaggerTAE = createEngineDescription(
+                                "desc.medtaggeriedesc.aggregate_analysis_engine.MedTaggerDynamicIEAggregateTAE");
+                    } catch (InvalidXMLException | IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    AggregateBuilder ab = new AggregateBuilder();
+                    ab.add(descMedTaggerTAE);
+                    // And register the stream
+                    try {
+                        uimaServer.registerStream(id, AnalysisEngineFactory.createEngineDescription(DynamicIEMetadataExtractionAnnotator.class), ab.createAggregateDescription());
+                    } catch (ResourceInitializationException e) {
+                        e.printStackTrace();
+                    }
+                    Logger.getLogger(getName()).log(Level.INFO, "Registered medtagger stream " + id);
+                } else {
+                    String resourcePath = new File(pipeline.get("path").asText()).getAbsolutePath();
+                    // Now construct the appropriate analysis engine
+                    AnalysisEngineDescription descMedTaggerTAE = null;
+                    try {
+                        descMedTaggerTAE = createEngineDescription(
+                                "desc.medtaggeriedesc.aggregate_analysis_engine.MedTaggerIEAggregateTAE");
+                    } catch (InvalidXMLException | IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    AnalysisEngineMetaData metadata = descMedTaggerTAE.getAnalysisEngineMetaData();
+
+                    ConfigurationParameterSettings settings = metadata.getConfigurationParameterSettings();
+                    settings.setParameterValue("Resource_dir", resourcePath);
+                    metadata.setConfigurationParameterSettings(settings);
+
+                    AggregateBuilder ab = new AggregateBuilder();
+                    ab.add(descMedTaggerTAE);
+                    // And register the stream
+                    try {
+                        uimaServer.registerStream(id, null, ab.createAggregateDescription());
+                    } catch (ResourceInitializationException e) {
+                        e.printStackTrace();
+                    }
+                    Logger.getLogger(getName()).log(Level.INFO, "Registered medtagger stream " + id);
                 }
-
-                AnalysisEngineMetaData metadata = descMedTaggerTAE.getAnalysisEngineMetaData();
-
-                ConfigurationParameterSettings settings = metadata.getConfigurationParameterSettings();
-                settings.setParameterValue("Resource_dir", resourcePath);
-                metadata.setConfigurationParameterSettings(settings);
-
-                AggregateBuilder ab = new AggregateBuilder();
-                ab.add(descMedTaggerTAE);
-                // And register the stream
-                try {
-                    uimaServer.registerStream(id, null, ab.createAggregateDescription());
-                } catch (ResourceInitializationException e) {
-                    e.printStackTrace();
-                }
-                Logger.getLogger(getName()).log(Level.INFO, "Registered medtagger stream " + id);
             });
         } catch (Throwable e) {
             e.printStackTrace();

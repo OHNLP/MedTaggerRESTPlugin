@@ -1,22 +1,17 @@
 package org.ohnlp.medtagger.rest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.mayo.dhs.uima.server.api.UIMANLPResultSerializer;
 import org.apache.uima.cas.CAS;
-import org.apache.uima.cas.CASException;
 import org.apache.uima.fit.util.JCasUtil;
 import org.ohnlp.medtagger.type.ConceptMention;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ConceptMentionResultSerializer implements UIMANLPResultSerializer {
     @Override
